@@ -15,7 +15,7 @@ server.set('view engine', 'ejs'); //set() is used to set some settings in expres
 
 //next we have to set the route where ejs will find the views folder
 server.set('views', Path.join(process.cwd(), 'src','views')); //by default it looks for views folder in root directory
-//server.set('views', Path.join(path.resolve() 'src','views'));
+//server.set('views', Path.join(path.resolve(), 'src','views'));
 
 //after setup of view engine we have to use ejs layouts middleware
 server.use(ejsLayouts);//this will help to use layouts in ejs files
