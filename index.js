@@ -6,6 +6,10 @@ import ejsLayouts from 'express-ejs-layouts';
 
 const server = express();
 
+//parse form data
+server.use(express.urlencoded({extended:true})); //this middleware will parse the incoming form data and
+//populate the req.body object with the parsed data
+
 // server.get('/',(req,res) => {
 //     return res.send('Welcome to Inventory App');
 // })
@@ -23,6 +27,13 @@ server.use(ejsLayouts);//this will help to use layouts in ejs files
 const productController = new ProductController();
 
 server.get('/', productController.getProducts);
+server.get('/new', productController.getAddForm);
+
+//for the same URL we can have multiple methods with different HTTP verbs
+server.post('/', productController.addNewProduct);
+
+//to serve static files like css,js,image files we have to use express.static() middleware
+
 server.use(express.static('src/views'));
 
 server.listen(3400);
