@@ -7,13 +7,6 @@ export default class ProductController {
   getProducts(req, res) {
     let products = ProductModel.get();
     console.log(products);
-    //we are not going to use below line it anymore after ejs addition
-    //return res.sendFile(path.join(process.cwd(),'src','views','products.html'));
-    //or
-    //return res.sendFile(path.resolve('src','views','products.html'));
-
-    //the render() function takes parameters view name(i.e ejs file name) and data to be sent to view
-    //data is sent in form of object
     return res.render("products", { products: products });
 
     //N.B:- The key name in the object i.e 'products' should be same as used in ejs file to access the data
@@ -22,17 +15,38 @@ export default class ProductController {
   //now I need to send the new-product form to the user, so that he can add new products
   //for that I will create a new method in this controller
   getAddForm(req, res) {
-    return res.render('new-product');
+    return res.render('new-product',{errors: null});
+    //return res.render("new-product", { errors: [] }); //initially there will be no errors in the form
   }
 
   //now let's make another controller method here to get and show the received data
   // when the user submits the new product form
   addNewProduct(req, res) {
-    //but for that we first need to access the form data sent by user
-    console.log(req.body); //this should print the form data in console, but will get undefined
-    //because express by default does not parse the incoming form data
-    //so we need to use a middleware to parse the incoming form data i.e express.urlencoded()
-    //we have added that middleware in index.js file
+    //console.log(req.body);
+
+    //before adding new data to the array we have to validate the data
+    const { name, price, imageUrl } = req.body;
+    let errors = [];
+    if (!name || name.trim() === "") {
+      errors.push("Product name is required");
+    }
+    if (!price || parseFloat(price) < 1) {
+      errors.push("Price should be a positive number");
+    }
+    //for url use try and catch
+    try {
+      const validUrl = new URL(imageUrl); //if url is invalid it will throw error
+      //this is a instance of URL class, url class is inbuilt in JS is primarily used for parsing of url strings
+    } catch (err) {
+      errors.push("Please provide a valid image URL");
+    }
+
+    if (errors.length > 0) {
+      //i.e if there are any validation errors
+      //return res.render("new-product", { errors: errors[0], formData: req.body });
+      return res.render("new-product", { errors: errors[0]}); //sending back the form data so that user does not have to retype it
+      //his provides a better user experience—instead of forcing the user to re-type everything after validation errors, the form retains their previously entered data so they only need to fix the problematic fields.
+    }
 
     //after using the middleware we will be able to see the form data in req.body
     ProductModel.add(req.body);
