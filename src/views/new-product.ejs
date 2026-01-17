@@ -1,23 +1,52 @@
- <!-- now let's see how users can add new products to the inventory -->
- <!-- views/add-product.ejs -->
+<!-- now let's see how users can add new products to the inventory -->
+<!-- views/add-product.ejs -->
 
 <h1 class="mt-5 mb-4">Add New Product</h1>
+<!-- for error view when error arises-->
+<% if (errorMessage) { %>
+  <div class="alert alert-danger" role="alert">
+    <%= errorMessage %>
+  </div>
+<% } %>
 <form action="/" method="post">
-    <div class="mb-3">
-        <label for="name" class="form-label">Product Name</label>
-        <input type="text" class="form-control" id="name" name="name" required>
-    </div>
-    <div class="mb-3">
-        <label for="desc" class="form-label">Product Description</label>
-        <textarea class="form-control" id="desc" name="desc" rows="3" required></textarea>
-    </div>
-    <div class="mb-3">
-        <label for="price" class="form-label">Price</label>
-        <input type="number" class="form-control" id="price" name="price" step="0.01" min="0" required>
-    </div>
-    <div class="mb-3">
-        <label for="imageUrl" class="form-label">Image URL</label>
-        <input type="url" class="form-control" id="imageUrl" name="imageUrl" required>
-    </div>
-    <button type="submit" class="btn btn-primary">Add Product</button>
+  <div class="mb-3">
+    <label for="name" class="form-label">Product Name</label>
+    <!-- use formdata to don't write everything again and again -->
+    <input type="text" class="form-control" id="name" name="name" value="<%= typeof formData !== 'undefined' ? formData.name : '' %>" required />
+  </div>
+  <div class="mb-3">
+    <label for="desc" class="form-label">Product Description</label>
+    <textarea
+      class="form-control"
+      id="desc"
+      name="desc"
+      rows="3"
+      required
+    ><%= typeof formData !== 'undefined' ? formData.desc : '' %></textarea>
+  </div>
+  <div class="mb-3">
+    <label for="price" class="form-label">Price</label>
+    <input
+      type="number"
+      class="form-control"
+      id="price"
+      name="price"
+      step="0.01"
+      min="0"
+        value="<%= typeof formData !== 'undefined' ? formData.price : '' %>"
+      required
+    />
+  </div>
+  <div class="mb-3">
+    <label for="imageUrl" class="form-label">Image URL</label>
+    <input
+      type="url"
+      class="form-control"
+      id="imageUrl"
+      name="imageUrl"
+      value="<%= typeof formData !== 'undefined' ? formData.imageUrl : '' %>"
+      required
+    />
+  </div>
+  <button type="submit" class="btn btn-primary">Add Product</button>
 </form>

@@ -22,18 +22,37 @@ export default class ProductController {
   //now I need to send the new-product form to the user, so that he can add new products
   //for that I will create a new method in this controller
   getAddForm(req, res) {
-    return res.render('new-product');
+    
+    return res.render('new-product', { errorMessage: null });
   }
 
   //now let's make another controller method here to get and show the received data
   // when the user submits the new product form
   addNewProduct(req, res) {
-    //but for that we first need to access the form data sent by user
-    console.log(req.body); //this should print the form data in console, but will get undefined
-    //because express by default does not parse the incoming form data
-    //so we need to use a middleware to parse the incoming form data i.e express.urlencoded()
-    //we have added that middleware in index.js file
+    
+    //befor adding we will be validating the data on server side
+    const { name, price, imageUrl } = req.body;
+    let errors = [];
+    if (!name || name.trim() == '') {
+      errors.push('Name is required');
+    }
+    if (!price || parseFloat(price) < 1) {
+      errors.push(
+        'Price must be a positive value'
+      );
+    }
+    try {
+      const validUrl = new URL(imageUrl);
+    } catch (err) {
+      errors.push('URL is invalid');
+    }
 
+    if (errors.length > 0) {
+      //I also want formData to be added so that I didn't need to retype everything again and again
+      return res.render('new-product', {
+        errorMessage: errors[0], formData: req.body
+      });
+    }
     //after using the middleware we will be able to see the form data in req.body
     ProductModel.add(req.body);
 
