@@ -3,6 +3,7 @@ import express from 'express';
 import ProductController from './src/controllers/product.controller.js';
 import Path from 'path';
 import ejsLayouts from 'express-ejs-layouts';
+import validateRequest from './src/middlewares/validation.middleware.js';
 
 const server = express();
 
@@ -30,7 +31,9 @@ server.get('/', productController.getProducts);
 server.get('/new', productController.getAddForm);
 
 //for the same URL we can have multiple methods with different HTTP verbs
-server.post('/', productController.addNewProduct);
+//before adding a new product we will be validating the data on server side using validation middleware
+//so we will add that middleware in the pipeline for this route
+server.post('/', validateRequest, productController.addNewProduct);
 
 //to serve static files like css,js,image files we have to use express.static() middleware
 
