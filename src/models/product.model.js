@@ -16,6 +16,14 @@ export default class ProductModel {
       products[index] = productObj;
     }
   }
+  //delete method
+  static delete(id){
+    const index = products.findIndex((p) => p.id == id);
+    if(index !== -1){
+      products.splice(index,1);
+    }
+  }
+
   //add a static method to add new product
   static add(productData) {
     let newProduct = new ProductModel(
