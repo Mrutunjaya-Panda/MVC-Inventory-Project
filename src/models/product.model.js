@@ -10,6 +10,12 @@ export default class ProductModel {
     return products;
   }
 
+  static update(productObj){
+    const index = products.findIndex((p) => p.id == productObj.id);
+    if(index !== -1){
+      products[index] = productObj;
+    }
+  }
   //add a static method to add new product
   static add(productData) {
     let newProduct = new ProductModel(
@@ -20,6 +26,10 @@ export default class ProductModel {
       productData.imageUrl
     );
     products.push(newProduct);
+  }
+
+  static getById(id){
+    return products.find((p) => p.id == id);
   }
 }
 

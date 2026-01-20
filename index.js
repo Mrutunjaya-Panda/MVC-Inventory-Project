@@ -30,12 +30,19 @@ const productController = new ProductController();
 server.get('/', productController.getProducts);
 server.get('/new', productController.getAddForm);
 
+//we cannot hard code the id in the URL, so we will use route parameters to get the id dynamically
+//route parameter/URL parameters is defined by adding a colon before the parameter name
+server.get('/update-product/:id', productController.getUpdateProductView);//we are not submitting any form here, just getting the update form
+
 //for the same URL we can have multiple methods with different HTTP verbs
 //before adding a new product we will be validating the data on server side using validation middleware
 //so we will add that middleware in the pipeline for this route
 server.post('/', validateRequest, productController.addNewProduct);
 
+//we will have one more post route to handle the form submission for updating a product
 //to serve static files like css,js,image files we have to use express.static() middleware
+
+server.post('/update-product',productController.postUpdateProduct);
 
 server.use(express.static('src/views'));
 

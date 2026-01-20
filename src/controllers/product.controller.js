@@ -22,17 +22,51 @@ export default class ProductController {
   //now I need to send the new-product form to the user, so that he can add new products
   //for that I will create a new method in this controller
   getAddForm(req, res) {
-    
-    return res.render('new-product', { errorMessage: null });
+    return res.render("new-product", { errorMessage: null });
   }
 
   //now let's make another controller method here to get and show the received data
   // when the user submits the new product form
   addNewProduct(req, res) {
-    
-    
     //after using the middleware we will be able to see the form data in req.body
     ProductModel.add(req.body);
+
+    //retrieve the updated products list and render the products view again
+    let products = ProductModel.get();
+    return res.render("products", { products: products });
+  }
+
+  //function for updating a product can also be added here
+  getUpdateProductView(req, res, next) {
+    //1. if product with given id exists, then render the update form with existing data
+    //const { id } = req.body; wrong way to get id as we are not submitting any form here
+
+    const { id } = req.params; //correct way to get id from route parameters
+    //req.params is an json object that contains all the route parameters
+    //so I need to convert the id to integer before comparing or just use double equals operator
+    //const productId = parseInt(id);
+
+    const productFound = ProductModel.getById(id);
+    if (productFound) {
+      //render the update-product view here
+      return res.render("update-product", {
+        product: productFound,//you might be wondering how here we are using product key, it is because in the ejs file we are using product to access the data
+        //i.e in products.ejs we are using product.name, product.desc etc to access the data
+        //don't think how we are using product key here, just remember that the key name should be same as used in ejs file/model files to access the data
+        errorMessage: null,
+      });
+    }
+    //2. else return errors
+    else {
+      return res
+        .status(401)
+        .send("Product with given id does not exist/not found");
+      //return res.render('update-product', {errorMessage: 'Product with given id does not exist'});
+    }
+  }
+
+  postUpdateProduct(req,res,next){
+    ProductModel.update(req.body);
 
     //retrieve the updated products list and render the products view again
     let products = ProductModel.get();
