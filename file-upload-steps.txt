@@ -1,0 +1,6 @@
+1. Install multer. -Done
+2. changes in view -Done
+3. middleware to handle files:- basically we will store the image in our server and will then
+//copy the url of that stored file and add it to the arry. - done
+4. Apply the middleware
+5. Update controller to update urls of images

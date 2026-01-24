@@ -29,7 +29,15 @@ const validateRequest = async (req, res, next) => {
     body("price")
       .isFloat({ gt: 1 })
       .withMessage("Price must be a positive value"),
-    body("imageUrl").isURL().withMessage("URL is invalid"),
+    // body("imageUrl").isURL().withMessage("URL is invalid"),
+    //by custom validator we can also validate if file is uploaded or not
+    body("imageUrl").custom((value, {req})=>{
+      if(!req.file){
+        throw new Error('Image file is required');
+      }
+      return true;
+    })
+    //here value refers to the value of imageUrl field in the form
   ];
 
   //2. run those rules against incoming request

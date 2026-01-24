@@ -25,13 +25,14 @@ export default class ProductModel {
   }
 
   //add a static method to add new product
-  static add(productData) {
+  //change the add method for uploaded file
+  static add(name,desc,price,imageUrl) {
     let newProduct = new ProductModel(
       products.length + 1,
-      productData.name,
-      productData.desc,
-      productData.price,
-      productData.imageUrl
+      name,
+      desc,
+      price,
+      imageUrl
     );
     products.push(newProduct);
   }

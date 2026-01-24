@@ -4,6 +4,7 @@ import ProductController from "./src/controllers/product.controller.js";
 import Path from "path";
 import ejsLayouts from "express-ejs-layouts";
 import validateRequest from "./src/middlewares/validation.middleware.js";
+import { uploadFile } from "./src/middlewares/file-upload.middleware.js";
 
 const server = express();
 
@@ -42,7 +43,9 @@ server.post("/delete-product/:id", productController.deleteProduct);
 //for the same URL we can have multiple methods with different HTTP verbs
 //before adding a new product we will be validating the data on server side using validation middleware
 //so we will add that middleware in the pipeline for this route
-server.post("/", validateRequest, productController.addNewProduct);
+
+server.post("/", uploadFile.single("imageUrl"), validateRequest, productController.addNewProduct);
+//this .single() method is used to upload a single file, the parameter is the name of the input field in the form
 
 //we will have one more post route to handle the form submission for updating a product
 //to serve static files like css,js,image files we have to use express.static() middleware

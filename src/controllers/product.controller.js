@@ -6,7 +6,7 @@ import ProductModel from "../models/product.model.js";
 export default class ProductController {
   getProducts(req, res) {
     let products = ProductModel.get();
-    console.log(products);
+    //console.log(products);
     //we are not going to use below line it anymore after ejs addition
     //return res.sendFile(path.join(process.cwd(),'src','views','products.html'));
     //or
@@ -29,7 +29,9 @@ export default class ProductController {
   // when the user submits the new product form
   addNewProduct(req, res) {
     //after using the middleware we will be able to see the form data in req.body
-    ProductModel.add(req.body);
+    const {name,desc,price} = req.body;
+    const imageUrl = req.file ? '/images/' + req.file.filename : '';
+    ProductModel.add(name,desc,price,imageUrl);
 
     //retrieve the updated products list and render the products view again
     let products = ProductModel.get();
