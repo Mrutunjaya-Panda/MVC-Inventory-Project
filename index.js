@@ -50,7 +50,7 @@ server.post("/", uploadFile.single("imageUrl"), validateRequest, productControll
 //we will have one more post route to handle the form submission for updating a product
 //to serve static files like css,js,image files we have to use express.static() middleware
 
-server.post("/update-product", productController.postUpdateProduct);
+server.post("/update-product", uploadFile.single("imageUrl"), productController.postUpdateProduct);
 
 server.use(express.static("src/views"));
 

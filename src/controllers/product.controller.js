@@ -68,7 +68,11 @@ export default class ProductController {
   }
 
   postUpdateProduct(req,res,next){
-    ProductModel.update(req.body);
+    const {id,name,desc,price} = req.body;
+    const imageUrl = req.file ? '/images/' + req.file.filename : '';
+    //req.body.imageUrl = imageUrl; //add the imageUrl to the req.body object
+    const updatedObj = new ProductModel(id,name,desc,price,imageUrl);
+    ProductModel.update(updatedObj);
 
     //retrieve the updated products list and render the products view again
     let products = ProductModel.get();
