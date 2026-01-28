@@ -1,22 +1,30 @@
 //const express = require('express');
 import express from "express";
 import ProductController from "./src/controllers/product.controller.js";
+import UserController from "./src/controllers/user.controller.js";
 import Path from "path";
 import ejsLayouts from "express-ejs-layouts";
 import validateRequest from "./src/middlewares/validation.middleware.js";
 import { uploadFile } from "./src/middlewares/file-upload.middleware.js";
+import session from "express-session";
+
+import {auth} from "./src/middlewares/auth.middleware.js";
 
 const server = express();
 
 server.use(express.static("public")); //to serve static files from public folder, currently created for deleting popup feature
 
 //parse form data
-server.use(express.urlencoded({ extended: true })); //this middleware will parse the incoming form data and
-//populate the req.body object with the parsed data
 
-// server.get('/',(req,res) => {
-//     return res.send('Welcome to Inventory App');
-// })
+//we have to configure for session
+server.use(session({
+    secret: "SecretKey",
+    resave: false,
+    saveUninitialized: true,
+    cookie: {secure: false},
+}));
+server.use(express.urlencoded({ extended: true })); //this middleware will parse the incoming form data and
+
 
 //setup view engine settings
 server.set("view engine", "ejs"); //set() is used to set some settings in express app
@@ -29,28 +37,36 @@ server.set("views", Path.join(process.cwd(), "src", "views")); //by default it l
 server.use(ejsLayouts); //this will help to use layouts in ejs files
 
 const productController = new ProductController();
+const userController = new UserController();
 
-server.get("/", productController.getProducts);
-server.get("/new", productController.getAddForm);
-
+server.get("/", auth, productController.getProducts);
+server.get("/new", auth, productController.getAddForm);
 //we cannot hard code the id in the URL, so we will use route parameters to get the id dynamically
 //route parameter/URL parameters is defined by adding a colon before the parameter name
-server.get("/update-product/:id", productController.getUpdateProductView); //we are not submitting any form here, just getting the update form
+server.get("/update-product/:id", auth, productController.getUpdateProductView); //we are not submitting any form here, just getting the update form
+
+//route to serve register ejs file
+server.get("/register", userController.getRegister);
+server.get("/login",userController.getLogin);
+server.post("/register",userController.postRegister);
+server.post("/login", userController.postLogin);
+
+
 
 //to delete
-server.post("/delete-product/:id", productController.deleteProduct);
+server.post("/delete-product/:id", auth, productController.deleteProduct);
 
 //for the same URL we can have multiple methods with different HTTP verbs
 //before adding a new product we will be validating the data on server side using validation middleware
 //so we will add that middleware in the pipeline for this route
 
-server.post("/", uploadFile.single("imageUrl"), validateRequest, productController.addNewProduct);
+server.post("/", auth, uploadFile.single("imageUrl"), validateRequest, productController.addNewProduct);
 //this .single() method is used to upload a single file, the parameter is the name of the input field in the form
 
 //we will have one more post route to handle the form submission for updating a product
 //to serve static files like css,js,image files we have to use express.static() middleware
 
-server.post("/update-product", uploadFile.single("imageUrl"), productController.postUpdateProduct);
+server.post("/update-product", auth, uploadFile.single("imageUrl"), productController.postUpdateProduct);
 
 server.use(express.static("src/views"));
 
