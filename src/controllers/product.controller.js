@@ -14,7 +14,7 @@ export default class ProductController {
 
     //the render() function takes parameters view name(i.e ejs file name) and data to be sent to view
     //data is sent in form of object
-    return res.render("products", { products: products });
+    return res.render("products", { products: products, userEmail: req.session.userEmail });
 
     //N.B:- The key name in the object i.e 'products' should be same as used in ejs file to access the data
   }
@@ -22,7 +22,7 @@ export default class ProductController {
   //now I need to send the new-product form to the user, so that he can add new products
   //for that I will create a new method in this controller
   getAddForm(req, res) {
-    return res.render("new-product", { errorMessage: null });
+    return res.render("new-product", { errorMessage: null, userEmail: req.session.userEmail });
   }
 
   //now let's make another controller method here to get and show the received data
@@ -35,7 +35,7 @@ export default class ProductController {
 
     //retrieve the updated products list and render the products view again
     let products = ProductModel.get();
-    return res.render("products", { products: products });
+    return res.render("products", { products: products, userEmail: req.session.userEmail });
   }
 
   //function for updating a product can also be added here
@@ -56,6 +56,7 @@ export default class ProductController {
         //i.e in products.ejs we are using product.name, product.desc etc to access the data
         //don't think how we are using product key here, just remember that the key name should be same as used in ejs file/model files to access the data
         errorMessage: null,
+        userEmail: req.session.userEmail
       });
     }
     //2. else return errors

@@ -52,6 +52,16 @@
                 >New Product</a
               >
             </li>
+
+            <!-- logout conditionally -->
+             <!-- locals refer to all the data or variables, which we are passing from server side to the reciver side. -->
+             <% if(locals.userEmail) { %>
+                <li class="nav-item">
+              <a class="nav-link active" aria-current="page" href="/logout"
+                >Logout</a
+              >
+            </li>
+             <% }else { %>
             <li class="nav-item">
               <a class="nav-link active" aria-current="page" href="/register"
                 >Register</a
@@ -62,6 +72,7 @@
                 >Login</a
               >
             </li>
+            <% } %>
           </ul>
         </div>
       </div>

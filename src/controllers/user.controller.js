@@ -31,6 +31,18 @@ export default class UserController{
         req.session.userEmail = email; //now you will see that session ID is stored on cookies
         //when on the browser
         let products = ProductModel.get();
-        return res.render("products", { products });
+        return res.render("products", { products, userEmail: req.session.userEmail });
+    }
+
+    //adding a function to handle logout request
+    logout(req,res){
+        //on logout destroy the session
+        req.session.destroy((err) => {
+            if(err){
+                console.log(err);
+            }else{
+                res.redirect('/login');
+            }
+        })
     }
 }

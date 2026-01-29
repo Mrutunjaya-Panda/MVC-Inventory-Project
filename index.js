@@ -51,7 +51,8 @@ server.get("/login",userController.getLogin);
 server.post("/register",userController.postRegister);
 server.post("/login", userController.postLogin);
 
-
+//route to handle logout
+server.get("/logout",userController.logout);
 
 //to delete
 server.post("/delete-product/:id", auth, productController.deleteProduct);
