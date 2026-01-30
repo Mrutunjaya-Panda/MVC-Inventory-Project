@@ -44,5 +44,7 @@ export default class UserController{
                 res.redirect('/login');
             }
         })
+        // after logging out, suppose you want to clear your cookie, you can do so by:-
+        res.clearCookie("lastVisit"); //takes argument as name of your cookie you want to delete.
     }
 }

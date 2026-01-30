@@ -10,6 +10,9 @@ import session from "express-session";
 
 import {auth} from "./src/middlewares/auth.middleware.js";
 
+import cookieParser from "cookie-parser";
+import { setLastVisit } from "./src/middlewares/lastVisit.middleware.js";
+
 const server = express();
 
 server.use(express.static("public")); //to serve static files from public folder, currently created for deleting popup feature
@@ -25,6 +28,9 @@ server.use(session({
 }));
 server.use(express.urlencoded({ extended: true })); //this middleware will parse the incoming form data and
 
+// create and use cookies to see the last time visited of a user
+server.use(cookieParser());
+//server.use(setLastVisit); //will be used for all the requests
 
 //setup view engine settings
 server.set("view engine", "ejs"); //set() is used to set some settings in express app
@@ -39,7 +45,7 @@ server.use(ejsLayouts); //this will help to use layouts in ejs files
 const productController = new ProductController();
 const userController = new UserController();
 
-server.get("/", auth, productController.getProducts);
+server.get("/", setLastVisit, auth, productController.getProducts);
 server.get("/new", auth, productController.getAddForm);
 //we cannot hard code the id in the URL, so we will use route parameters to get the id dynamically
 //route parameter/URL parameters is defined by adding a colon before the parameter name
