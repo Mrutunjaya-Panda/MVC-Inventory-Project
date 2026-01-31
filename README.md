@@ -336,6 +336,16 @@ Works correctly with AJAX (fetch) and page reloads
 
 Follows real-world MVC and REST principles
 
+## res.redirect("/") forces:
+
+1. URL normalization
+
+2. New request lifecycle
+
+3. Middleware re-execution
+
+4. Single rendering authority (GET)
+
 ```
 # 📌 Key Takeaway
 ```
