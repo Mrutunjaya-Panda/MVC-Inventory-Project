@@ -247,6 +247,104 @@ http://localhost:3000
 
 ---
 
+## 🐞 Bug Explained: Delete Not Working After Adding New Product
+
+During development, a subtle but important bug was encountered related to **product deletion after adding a new product**. This section documents the issue, its root cause, and the architectural fix applied.
+
+---
+
+### ❌ The Problem
+
+- Deleting the **initial products (Product 1, 2, 3)** worked correctly.
+- Deleting **newly added products** did **not appear to work**, even though no error was thrown.
+- The delete logic itself was correct, which made the issue confusing to debug.
+
+---
+
+### 🔍 Root Cause Analysis
+
+The issue was **not in the delete logic**, but in how the **Add Product flow rendered the view**.
+
+The application was **rendering the products page directly from a POST request** instead of redirecting to a GET route.
+
+This created **two different rendering paths** for the same page:
+
+| Route | HTTP Method | Rendering Source |
+|------|------------|------------------|
+| `/` | GET | `getProducts()` controller |
+| `/` | POST | `addNewProduct()` controller |
+
+When a product was deleted using `fetch()` and the page was reloaded, the browser always triggered a **GET `/` request**, which re-rendered products from a different lifecycle than the POST-rendered state.  
+This caused newly added products to **appear as if they were not deleted**, even though they were removed from memory.
+
+---
+
+### ❌ Incorrect Pattern (Buggy)
+
+```text
+POST /add-product
+   ↓
+Modify data
+   ↓
+res.render("products")   ❌
+
+Why this caused the bug:
+
+Rendering occurred inside a POST request
+
+No redirect happened
+
+Browser reload triggered GET /
+
+Two different render sources caused inconsistent UI state
+```
+# ✅ Correct Pattern (Post/Redirect/Get – PRG)
+```
+The fix was to follow the Post/Redirect/Get (PRG) pattern, which is a standard MVC best practice.
+POST /add-product
+   ↓
+Modify data
+   ↓
+res.redirect("/")
+   ↓
+GET /
+   ↓
+Render products
+```
+# ✅ Fixed Code (Add Product Controller)
+```
+addNewProduct(req, res) {
+  const { name, desc, price } = req.body;
+  const imageUrl = req.file ? "/images/" + req.file.filename : "";
+
+  ProductModel.add(name, desc, price, imageUrl);
+
+  // Redirect instead of rendering
+  return res.redirect("/");
+}
+```
+
+# 🧠 Why This Fix Works
+```
+Ensures GET / is the single source of truth for rendering products
+
+Prevents stale or mixed rendering states
+
+Keeps middleware execution consistent (auth, cookies, sessions)
+
+Works correctly with AJAX (fetch) and page reloads
+
+Follows real-world MVC and REST principles
+
+```
+# 📌 Key Takeaway
+```
+POST routes should modify data and redirect.
+GET routes should render data.
+Never render views directly from POST requests.
+
+```
+
 ## 👨‍💻 Author
 
 **Mrutunjaya Panda**
