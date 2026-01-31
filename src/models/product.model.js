@@ -18,7 +18,7 @@ export default class ProductModel {
   }
   //delete method
   static delete(id){
-    const index = products.findIndex((p) => p.id == id);
+    const index = products.findIndex((p) => Number(p.id) === Number(id));
     if(index !== -1){
       products.splice(index,1);
     }
@@ -28,7 +28,7 @@ export default class ProductModel {
   //change the add method for uploaded file
   static add(name,desc,price,imageUrl) {
     let newProduct = new ProductModel(
-      products.length + 1,
+      Date.now(),
       name,
       desc,
       price,
@@ -38,7 +38,7 @@ export default class ProductModel {
   }
 
   static getById(id){
-    return products.find((p) => p.id == id);
+    return products.find((p) => Number(p.id) === Number(id));
   }
 }
 

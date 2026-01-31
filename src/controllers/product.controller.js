@@ -14,7 +14,10 @@ export default class ProductController {
 
     //the render() function takes parameters view name(i.e ejs file name) and data to be sent to view
     //data is sent in form of object
-    return res.render("products", { products: products, userEmail: req.session.userEmail });
+    return res.render("products", {
+      products: products,
+      userEmail: req.session.userEmail,
+    });
 
     //N.B:- The key name in the object i.e 'products' should be same as used in ejs file to access the data
   }
@@ -22,20 +25,33 @@ export default class ProductController {
   //now I need to send the new-product form to the user, so that he can add new products
   //for that I will create a new method in this controller
   getAddForm(req, res) {
-    return res.render("new-product", { errorMessage: null, userEmail: req.session.userEmail });
+    return res.render("new-product", {
+      errorMessage: null,
+      userEmail: req.session.userEmail,
+    });
   }
 
   //now let's make another controller method here to get and show the received data
   // when the user submits the new product form
   addNewProduct(req, res) {
     //after using the middleware we will be able to see the form data in req.body
-    const {name,desc,price} = req.body;
-    const imageUrl = req.file ? '/images/' + req.file.filename : '';
-    ProductModel.add(name,desc,price,imageUrl);
+    const { name, desc, price } = req.body;
+    const imageUrl = req.file ? "/images/" + req.file.filename : "";
+    ProductModel.add(name, desc, price, imageUrl);
 
-    //retrieve the updated products list and render the products view again
-    let products = ProductModel.get();
-    return res.render("products", { products: products, userEmail: req.session.userEmail });
+    /*//retrieve the updated products list and render the products view again
+    //let products = ProductModel.get();
+    // return res.render("products", {
+    //   products: products,
+    //   userEmail: req.session.userEmail,
+    // });
+      The above do not work because on the same route "/" we are both using GET and POST
+      REMEMBER:-
+      One-sentence intuition (remember this)
+      POST changes data. GET shows data. Never mix the two.
+
+    */
+    return res.redirect("/");
   }
 
   //function for updating a product can also be added here
@@ -52,11 +68,11 @@ export default class ProductController {
     if (productFound) {
       //render the update-product view here
       return res.render("update-product", {
-        product: productFound,//you might be wondering how here we are using product key, it is because in the ejs file we are using product to access the data
+        product: productFound, //you might be wondering how here we are using product key, it is because in the ejs file we are using product to access the data
         //i.e in products.ejs we are using product.name, product.desc etc to access the data
         //don't think how we are using product key here, just remember that the key name should be same as used in ejs file/model files to access the data
         errorMessage: null,
-        userEmail: req.session.userEmail
+        userEmail: req.session.userEmail,
       });
     }
     //2. else return errors
@@ -68,11 +84,11 @@ export default class ProductController {
     }
   }
 
-  postUpdateProduct(req,res,next){
-    const {id,name,desc,price} = req.body;
-    const imageUrl = req.file ? '/images/' + req.file.filename : '';
+  postUpdateProduct(req, res, next) {
+    const { id, name, desc, price } = req.body;
+    const imageUrl = req.file ? "/images/" + req.file.filename : "";
     //req.body.imageUrl = imageUrl; //add the imageUrl to the req.body object
-    const updatedObj = new ProductModel(id,name,desc,price,imageUrl);
+    const updatedObj = new ProductModel(id, name, desc, price, imageUrl);
     ProductModel.update(updatedObj);
 
     //retrieve the updated products list and render the products view again
@@ -81,16 +97,25 @@ export default class ProductController {
   }
 
   //delete product method
-  deleteProduct(req,res){
+  deleteProduct(req, res) {
     const id = req.params.id;
     const productFound = ProductModel.getById(id);
-    if(!productFound){
-      return res.status(401).send("Product with given id does not exist/not found");
+    if (!productFound) {
+      return res.status(404).json({
+        success: false,
+        message: "Product not found",
+      });
     }
     ProductModel.delete(id);
 
     //retrieve the updated products list and render the products view again
     var products = ProductModel.get();
     return res.render("products", { products: products });
+    // IMPORTANT: send JSON(preferebly when using fetch and working around it), not a rendered page
+    // but here both will work.
+    // return res.status(200).json({
+    //   success: true,
+    //   message: "Product deleted successfully",
+    // });
   }
 }
